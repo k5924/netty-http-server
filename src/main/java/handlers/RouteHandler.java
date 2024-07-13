@@ -6,13 +6,14 @@ import io.netty.handler.codec.http.FullHttpRequest;
 
 public final class RouteHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
-
     @Override
     protected void channelRead0(final ChannelHandlerContext channelHandlerContext,
                                 final FullHttpRequest fullHttpRequest) throws Exception {
         final SimpleChannelInboundHandler<FullHttpRequest> handler;
         if (fullHttpRequest.uri().equals("/")) {
             handler = new OkResponseHandler();
+        } else if (fullHttpRequest.uri().contains("/echo")) {
+            handler = new EchoHandler();
         } else {
             handler = new NotFoundHandler();
         }
