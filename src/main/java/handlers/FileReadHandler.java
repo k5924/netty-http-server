@@ -25,6 +25,7 @@ public final class FileReadHandler extends SimpleChannelInboundHandler<FullHttpR
         if (uriArr.length > 2) {
             final var fileName = directory + uriArr[2];
             final var file = new File(fileName);
+            System.out.println("file name is " + fileName);
             if (file.exists()) {
                 response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND);
                 final var raf = new RandomAccessFile(file, "r");
