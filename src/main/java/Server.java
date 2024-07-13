@@ -9,11 +9,14 @@ import io.netty.handler.logging.LoggingHandler;
 public final class Server {
 
     private final int port;
+    private final String directory;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
 
-    public Server(final int port) {
+    public Server(final int port,
+                  final String directory) {
         this.port = port;
+        this.directory = directory;
     }
 
     public void start() throws Exception {
@@ -24,7 +27,7 @@ public final class Server {
                 .group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .handler(new LoggingHandler(LogLevel.INFO))
-                .childHandler(new CustomChannelInitializer());
+                .childHandler(new CustomChannelInitializer(directory));
         final var channel = serverBootstrap.bind(port).sync().channel();
         channel.closeFuture().sync();
     }

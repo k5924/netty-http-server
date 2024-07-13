@@ -6,6 +6,12 @@ import io.netty.handler.codec.http.FullHttpRequest;
 
 public final class RouteHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
+    private final String directory;
+
+    public RouteHandler(final String directory) {
+        this.directory = directory;
+    }
+
     @Override
     protected void channelRead0(final ChannelHandlerContext channelHandlerContext,
                                 final FullHttpRequest fullHttpRequest) throws Exception {
@@ -16,6 +22,8 @@ public final class RouteHandler extends SimpleChannelInboundHandler<FullHttpRequ
             handler = new EchoHandler();
         } else if (fullHttpRequest.uri().contains("/user-agent")) {
             handler = new UserAgentHandler();
+        } else if (fullHttpRequest.uri().contains("/files")) {
+            handler = new FileReadHandler(directory);
         } else {
             handler = new NotFoundHandler();
         }

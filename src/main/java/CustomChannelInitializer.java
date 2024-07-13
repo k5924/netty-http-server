@@ -7,12 +7,18 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.stream.ChunkedWriteHandler;
 
 public final class CustomChannelInitializer extends ChannelInitializer<SocketChannel> {
+    private final String directory;
+
+    public CustomChannelInitializer(final String directory) {
+        this.directory = directory;
+    }
+
     @Override
     protected void initChannel(final SocketChannel socketChannel) throws Exception {
         final var pipeline = socketChannel.pipeline();
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpObjectAggregator(65536));
         pipeline.addLast(new ChunkedWriteHandler());
-        pipeline.addLast(new RouteHandler());
+        pipeline.addLast(new RouteHandler(directory));
     }
 }

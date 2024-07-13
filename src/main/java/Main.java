@@ -9,7 +9,14 @@ public class Main {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.out.println("Logs from your program will appear here!");
 
-    final var server = new Server(4221);
+    final String directory;
+    if (args.length > 1 && args[0].equals("--directory")) {
+        directory = args[1];
+    } else {
+        directory = "";
+    }
+
+    final var server = new Server(4221, directory);
       try {
           server.start();
           Runtime.getRuntime().addShutdownHook(new Thread(server::stop));
