@@ -1,4 +1,5 @@
 import handlers.OkResponseHandler;
+import handlers.RouteHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
@@ -12,6 +13,6 @@ public final class CustomChannelInitializer extends ChannelInitializer<SocketCha
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpObjectAggregator(65536));
         pipeline.addLast(new ChunkedWriteHandler());
-        pipeline.addLast(new OkResponseHandler());
+        pipeline.addLast(new RouteHandler());
     }
 }
