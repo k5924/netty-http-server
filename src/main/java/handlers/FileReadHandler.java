@@ -3,12 +3,9 @@ package handlers;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
-import io.netty.handler.stream.ChunkedFile;
 
 import java.io.File;
 import java.io.RandomAccessFile;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 public final class FileReadHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private final String directory;
@@ -27,7 +24,6 @@ public final class FileReadHandler extends SimpleChannelInboundHandler<FullHttpR
             final var file = new File(fileName);
             System.out.println("file name is " + fileName);
             if (file.exists()) {
-                System.out.println("file exist");
                 response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
                 final var raf = new RandomAccessFile(file, "r");
                 final var fileLength = raf.length();
@@ -41,7 +37,6 @@ public final class FileReadHandler extends SimpleChannelInboundHandler<FullHttpR
                 final var content = Unpooled.wrappedBuffer(arr);
                 response.content().writeBytes(content);
             } else {
-                System.out.println("file doesnt exist");
                 response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND);
             }
         } else {
