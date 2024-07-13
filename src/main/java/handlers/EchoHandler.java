@@ -15,8 +15,9 @@ public final class EchoHandler extends SimpleChannelInboundHandler<FullHttpReque
         final var uriArr = fullHttpRequest.uri().split("/");
         if (uriArr.length > 2) {
             response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
-            response.headers().add("Content-Type", "text/plain")
-                    .add("Content-Length", uriArr[2].length());
+            response.headers()
+                    .add(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.TEXT_PLAIN)
+                    .add(HttpHeaderNames.CONTENT_LENGTH, uriArr[2].length());
             response.content().writeBytes(uriArr[2].getBytes(StandardCharsets.UTF_8));
         } else {
             response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND);
