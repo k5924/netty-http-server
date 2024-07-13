@@ -1,15 +1,17 @@
-import handlers.RouteHandler;
+import handlers.OkResponseHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.http.HttpRequestDecoder;
-import io.netty.handler.codec.http.HttpResponseEncoder;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.stream.ChunkedWriteHandler;
 
 public final class CustomChannelInitializer extends ChannelInitializer<SocketChannel> {
     @Override
     protected void initChannel(final SocketChannel socketChannel) throws Exception {
         final var pipeline = socketChannel.pipeline();
-        pipeline.addLast(new HttpRequestDecoder());
-        pipeline.addLast(new HttpResponseEncoder());
-        pipeline.addLast(new RouteHandler());
+        pipeline.addLast(new HttpServerCodec());
+        pipeline.addLast(new HttpObjectAggregator(65536));
+        pipeline.addLast(new ChunkedWriteHandler());
+        pipeline.addLast(new OkResponseHandler());
     }
 }
