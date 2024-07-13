@@ -33,10 +33,26 @@ public final class FileReadHandler extends SimpleChannelInboundHandler<FullHttpR
                         .add(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_OCTET_STREAM)
                         .add(HttpHeaderNames.CONTENT_LENGTH, fileLength);
                 channelHandlerContext.write(response);
-                final var region = new DefaultFileRegion(raf.getChannel(), 0, fileLength);
-                channelHandlerContext
-                        .write(region);
+                final var sendFileFuture = channelHandlerContext.write(new ChunkedFile(raf, 0, fileLength, 8192), channelHandlerContext.newProgressivePromise());
+                sendFileFuture.addListener(new ChannelProgressiveFutureListener() {
+                    @Override
+                    public void operationProgressed(ChannelProgressiveFuture future, long progress, long total) {
+                        if (total < 0) {
+                            System.err.println("Transfer progress: " + progress);
+                        } else {
+                            System.err.println("Transfer progress: " + progress + " / " + total);
+                        }
+                    }
 
+                    @Override
+                    public void operationComplete(ChannelProgressiveFuture future) {
+                        System.err.println("Transfer complete.");
+                    }
+                });
+
+                final var lastContentFuture = channelHandlerContext.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
+                lastContentFuture.addListener(ChannelFutureListener.CLOSE);
+                raf.close();
             } else {
                 response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND);
                 channelHandlerContext
