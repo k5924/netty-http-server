@@ -29,14 +29,7 @@ public final class Server {
                 .group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .handler(new LoggingHandler(LogLevel.INFO))
-                .childHandler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(final SocketChannel channel) throws Exception {
-                        final var pipeline = channel.pipeline();
-                        pipeline.addLast(new HttpRequestDecoder());
-                        pipeline.addLast(new HttpResponseEncoder());
-                    }
-                });
+                .childHandler(new CustomChannelInitializer());
         final var channel = serverBootstrap.bind(port).sync().channel();
         channel.closeFuture().sync();
     }
