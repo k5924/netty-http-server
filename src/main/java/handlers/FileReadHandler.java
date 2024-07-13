@@ -30,7 +30,8 @@ public final class FileReadHandler extends SimpleChannelInboundHandler<FullHttpR
                 final var fileLength = raf.length();
                 HttpUtil.setContentLength(response, fileLength);
                 response.headers()
-                        .add("Content-Type", "application/octet-stream");
+                        .add("Content-Type", "application/octet-stream")
+                        .add(HttpHeaderNames.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"");
                 channelHandlerContext.write(response);
                 final var sendFileFuture = channelHandlerContext.write(new ChunkedFile(raf, 0, fileLength, 8192), channelHandlerContext.newProgressivePromise());
                 final var lastContentFuture = channelHandlerContext.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
