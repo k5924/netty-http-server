@@ -1,5 +1,6 @@
 package handlers;
 
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.DefaultFileRegion;
@@ -11,6 +12,7 @@ import io.netty.handler.codec.http.HttpVersion;
 
 import java.io.File;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 
 public final class FileWriteHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
@@ -33,7 +35,9 @@ public final class FileWriteHandler extends SimpleChannelInboundHandler<FullHttp
             final var raf = new RandomAccessFile(file, "rw");
             raf.setLength(0);
             final var content = fullHttpRequest.content();
-            raf.write(content.array());
+            final var bytes = new byte[content.readableBytes()];
+            content.readBytes(bytes);
+            raf.write(bytes);
             raf.close();
             response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.CREATED);
         } else {
