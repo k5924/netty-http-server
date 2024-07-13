@@ -35,8 +35,7 @@ public final class FileReadHandler extends SimpleChannelInboundHandler<FullHttpR
                 channelHandlerContext.write(response);
                 final var region = new DefaultFileRegion(raf.getChannel(), 0, fileLength);
                 channelHandlerContext
-                        .writeAndFlush(region)
-                        .addListener(ChannelFutureListener.CLOSE);
+                        .write(region);
 
             } else {
                 response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND);
