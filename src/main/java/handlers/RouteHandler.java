@@ -14,6 +14,8 @@ public final class RouteHandler extends SimpleChannelInboundHandler<FullHttpRequ
             handler = new OkResponseHandler();
         } else if (fullHttpRequest.uri().contains("/echo")) {
             handler = new EchoHandler();
+        } else if (fullHttpRequest.uri().contains("/user-agent")) {
+            handler = new UserAgentHandler();
         } else {
             handler = new NotFoundHandler();
         }
