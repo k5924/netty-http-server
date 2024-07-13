@@ -32,7 +32,7 @@ public final class FileReadHandler extends SimpleChannelInboundHandler<FullHttpR
                         .add(HttpHeaderNames.CONTENT_LENGTH, fileLength);
                 channelHandlerContext.write(response);
 
-                ChannelFuture sendFileFuture = channelHandlerContext.write(new ChunkedFile(raf, 0, fileLength, 8192), channelHandlerContext.newProgressivePromise());
+                ChannelFuture sendFileFuture = channelHandlerContext.write(new DefaultFileRegion(raf.getChannel(), 0, fileLength), channelHandlerContext.newProgressivePromise());
                 sendFileFuture.addListener(new ChannelProgressiveFutureListener() {
                     @Override
                     public void operationProgressed(ChannelProgressiveFuture future, long progress, long total) {
