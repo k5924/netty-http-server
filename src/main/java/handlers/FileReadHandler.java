@@ -28,7 +28,7 @@ public final class FileReadHandler extends SimpleChannelInboundHandler<FullHttpR
             System.out.println("file name is " + fileName);
             if (file.exists()) {
                 System.out.println("file exist");
-                response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND);
+                response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
                 final var raf = new RandomAccessFile(file, "r");
                 final var fileLength = raf.length();
                 HttpUtil.setContentLength(response, fileLength);
