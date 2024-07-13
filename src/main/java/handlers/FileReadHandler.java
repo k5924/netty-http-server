@@ -3,7 +3,6 @@ package handlers;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
-import io.netty.handler.stream.ChunkedFile;
 
 import java.io.File;
 import java.io.RandomAccessFile;
@@ -30,42 +29,19 @@ public final class FileReadHandler extends SimpleChannelInboundHandler<FullHttpR
                 response.headers()
                         .add(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_OCTET_STREAM)
                         .add(HttpHeaderNames.CONTENT_LENGTH, fileLength);
-                channelHandlerContext.write(response);
-
-                ChannelFuture sendFileFuture = channelHandlerContext.write(new DefaultFileRegion(raf.getChannel(), 0, fileLength), channelHandlerContext.newProgressivePromise());
-                sendFileFuture.addListener(new ChannelProgressiveFutureListener() {
-                    @Override
-                    public void operationProgressed(ChannelProgressiveFuture future, long progress, long total) {
-                        if (total < 0) {
-                            System.err.println("Transfer progress: " + progress);
-                        } else {
-                            System.err.println("Transfer progress: " + progress + " / " + total);
-                        }
-                    }
-
-                    @Override
-                    public void operationComplete(ChannelProgressiveFuture future) {
-                        System.err.println("Transfer complete.");
-                    }
-                });
-
-                ChannelFuture lastContentFuture = channelHandlerContext.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
-
-                    lastContentFuture.addListener(ChannelFutureListener.CLOSE);
-
+                final var arr = new byte[(int) fileLength];
+                raf.readFully(arr);
                 raf.close();
+                final var content = Unpooled.wrappedBuffer(arr);
+                response.content().writeBytes(content);
             } else {
                 response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND);
-                channelHandlerContext
-                        .writeAndFlush(response)
-                        .addListener(ChannelFutureListener.CLOSE);
             }
         } else {
             response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND);
-            channelHandlerContext
-                    .writeAndFlush(response)
-                    .addListener(ChannelFutureListener.CLOSE);
         }
-
+        channelHandlerContext
+                .writeAndFlush(response)
+                .addListener(ChannelFutureListener.CLOSE);
     }
 }
